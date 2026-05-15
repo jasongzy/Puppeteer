@@ -315,7 +315,21 @@ class SkeletonOPTDecoder(OPTDecoder):
             assert attention_mask is not None
             causal_attention_mask = attention_mask if 0 in attention_mask else None
         else:
-            raise ValueError("Only flash_attention_2 is supported")
+            # raise ValueError("Only flash_attention_2 is supported")
+            bsz, tgt_len = inputs_embeds.shape[:2]
+            src_len = tgt_len + past_key_values_length
+            causal_attention_mask = torch.full(
+                (bsz, 1, tgt_len, src_len),
+                torch.finfo(inputs_embeds.dtype).min,
+                dtype=inputs_embeds.dtype,
+                device=inputs_embeds.device,
+            )
+            mask_cond = torch.arange(tgt_len, device=inputs_embeds.device).view(tgt_len, 1) + past_key_values_length
+            mask_pos = torch.arange(src_len, device=inputs_embeds.device).view(1, src_len)
+            causal_attention_mask.masked_fill_(mask_pos <= mask_cond, 0.0)
+            if attention_mask is not None:
+                expanded_mask = (1.0 - attention_mask[:, None, None, :].to(inputs_embeds.dtype)) * torch.finfo(inputs_embeds.dtype).min
+                causal_attention_mask = causal_attention_mask + expanded_mask
 
         pos_embeds = self.embed_positions(attention_mask, past_key_values_length)
 

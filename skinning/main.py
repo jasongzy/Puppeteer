@@ -32,6 +32,20 @@ from utils.misc import NativeScalerWithGradNormCount as NativeScaler
 from utils.skin_data import SkinData
 from utils.util import save_skin_weights_to_rig, post_filter
 
+if not torch.cuda.is_available():
+    # Monkey Patch
+    from third_partys.PartField.partfield.model.PVCNN.pv_module.pvconv import PVConv
+
+    orig_init = PVConv.__init__
+
+    def patched_init(self, *args, **kwargs):
+        if kwargs.get("device", "cuda") == "cuda":
+            kwargs["device"] = "cpu"
+        orig_init(self, *args, **kwargs)
+
+    PVConv.__init__ = patched_init
+
+
 def get_args_parser():
     parser = argparse.ArgumentParser('Autoencoder', add_help=False)
     parser.add_argument('--batch_size', default=64, type=int,
@@ -263,6 +277,8 @@ def main(args):
 
     print('job dir: {}'.format(os.path.dirname(os.path.realpath(__file__))))
 
+    if not torch.cuda.is_available():
+        args.device = "cpu"
     device = torch.device(args.device)
 
     # fix the seed for reproducibility
@@ -317,8 +333,11 @@ def main(args):
     # print("Model = %s" % str(model))
     print('number of params (M): %.2f' % (n_parameters / 1.e6))
 
-    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
-    model_without_ddp = model.module
+    if device.type == "cuda":
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
+        model_without_ddp = model.module
+    else:
+        model_without_ddp = model
 
     optimizer = torch.optim.AdamW(model_without_ddp.parameters(), lr=args.lr)
 

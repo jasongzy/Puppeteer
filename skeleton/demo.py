@@ -133,7 +133,8 @@ if __name__ == "__main__":
         mixed_precision=args.precision,
     )
     
-    model = SkeletonGPT(args).cuda()
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = SkeletonGPT(args).to(device)
     
     if args.pretrained_weights is not None:
         pkg = torch.load(args.pretrained_weights, map_location=torch.device("cpu"))

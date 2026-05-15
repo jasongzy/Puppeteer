@@ -36,3 +36,5 @@ pytorch3d
 bpy==4.0.0
 
 setuptools<82  # for flash-attn
+
+gradio>=5

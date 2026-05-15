@@ -211,6 +211,13 @@ def save_on_master(*args, **kwargs):
 
 
 def init_distributed_mode(args):
+    if not torch.cuda.is_available():
+        args.distributed = False
+        args.rank = 0
+        args.gpu = 0
+        args.world_size = 1
+        return
+
     if args.dist_on_itp:
         args.rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
         args.world_size = int(os.environ['OMPI_COMM_WORLD_SIZE'])
