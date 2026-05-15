@@ -27,3 +27,12 @@ jsonargparse
 ptlflow
 imageio-ffmpeg==0.4.7
 xformers==0.0.23
+
+-f https://data.pyg.org/whl/torch-2.1.1+cu118.html
+torch-scatter
+-f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py310_cu118_pyt211/download.html
+pytorch3d
+--extra-index-url https://download.blender.org/pypi/
+bpy==4.0.0
+
+setuptools<82  # for flash-attn

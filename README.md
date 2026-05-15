@@ -58,11 +58,11 @@ We use Python 3.10 with PyTorch 2.1.1 and CUDA 11.8. The environment and require
 git clone https://github.com/Seed3D/Puppeteer.git --recursive && cd Puppeteer
 conda create -n puppeteer python==3.10.13 -y
 conda activate puppeteer
-pip install torch==2.1.1 torchvision==0.16.1 torchaudio==2.1.1 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.1.1 torchvision==0.16.1 --index-url https://download.pytorch.org/whl/cu118
+pip install cython==0.29.36
+pip install tetgen==0.5.2 --no-build-isolation
 pip install -r requirements.txt
-pip install flash-attn==2.6.3 --no-build-isolation
-pip install torch-scatter -f https://data.pyg.org/whl/torch-2.1.1+cu118.html
-pip install --no-index --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py310_cu118_pyt211/download.html
+pip install flash-attn==2.6.3 --no-build-isolation --no-cache-dir
 ```
 
 ## 🚀 Demo

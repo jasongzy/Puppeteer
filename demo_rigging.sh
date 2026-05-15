@@ -66,3 +66,8 @@ for file in *_skin.txt; do
 done
 cd ../../../
 echo "Final rig files copied to results/final_rigging/"
+
+for file in examples/*.obj; do
+    name=$(basename "$file" .obj)
+    python export.py --mesh examples/${name}.obj --rig results/final_rigging/${name}.txt --output examples/${name}.fbx
+done
